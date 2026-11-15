@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Salário Líquido 2026 | Calculadora de Ordenado</title>
+    <meta name="description" content="Calcula o teu salário líquido mensal em segundos. Simula descontos da Segurança Social, retenção de IRS e subsídio de alimentação em cartão ou dinheiro.">
+    
+    <!-- Código oficial do Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5376974314895899" crossorigin="anonymous"></script>
+
+    <!-- Tailwind CSS para o design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white min-h-screen p-4 sm:p-8 flex flex-col items-center justify-between">
+    <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl my-auto">
+        <header class="text-center mb-6">
+            <span class="bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/20">Finanças Pessoais</span>
+            <h1 class="text-2xl font-black text-white mt-3">Simulador de Salário Líquido 💶</h1>
+            <p class="text-slate-400 text-sm mt-1">Descobre quanto vais receber realmente ao fim do mês.</p>
+        </header>
+
+        <!-- Salário Bruto -->
+        <div class="bg-slate-800 p-4 rounded-xl mb-4">
+            <label class="text-xs text-slate-300 font-semibold block mb-2">Salário Bruto Mensal (€)</label>
+            <input type="number" id="salarioBruto" value="1200" min="0" step="10" oninput="simular()" 
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white text-lg font-bold focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <!-- Taxa de Retenção IRS -->
+        <div class="bg-slate-800 p-4 rounded-xl mb-4">
+            <div class="flex justify-between text-xs text-slate-300 mb-2">
+                <span>Taxa de Retenção IRS (%)</span>
+                <span id="labelIrs" class="font-bold text-emerald-400">11.5%</span>
+            </div>
+            <input type="range" id="taxaIrs" min="0" max="45" step="0.5" value="11.5" oninput="simular()" class="w-full accent-emerald-500">
+            <p class="text-[11px] text-slate-400 mt-1">Ajusta conforme o teu escalão, estado civil e número de dependentes.</p>
+        </div>
+
+        <!-- Subsídio de Alimentação -->
+        <div class="bg-slate-800 p-4 rounded-xl mb-6 space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="text-xs text-slate-300 font-semibold block mb-1">Subs. Alimentação / Dia (€)</label>
+                    <input type="number" id="subAlimentacaoDia" value="6.00" min="0" step="0.10" oninput="simular()" 
+                           class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-bold focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-300 font-semibold block mb-1">Dias Úteis</label>
+                    <input type="number" id="diasUteis" value="22" min="0" max="31" oninput="simular()" 
+                           class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-bold focus:outline-none focus:border-emerald-500">
+                </div>
+            </div>
+            
+            <div>
+                <label class="text-xs text-slate-300 font-semibold block mb-1">Forma de Pagamento do Subsídio</label>
+                <select id="tipoSubsidio" onchange="simular()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+                    <option value="cartao">Cartão Refeição (Isento até 9,60€/dia)</option>
+                    <option value="dinheiro">Em Dinheiro / Transferência (Isento até 6,00€/dia)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Painel de Resultados -->
+        <div class="bg-emerald-950/40 border border-emerald-500/30 p-5 rounded-xl space-y-3 mb-6">
+            <div class="text-center border-b border-emerald-500/20 pb-3">
+                <span class="text-xs text-slate-300 uppercase tracking-wider">Salário Líquido Total</span>
+                <p id="salarioLiquido" class="text-4xl font-black text-emerald-400 mt-1">0.00€</p>
+            </div>
+            
+            <div class="text-xs space-y-1.5 pt-1">
+                <div class="flex justify-between text-slate-300">
+                    <span>Segurança Social (11%):</span>
+                    <span id="valorSS" class="text-rose-400 font-semibold">-0.00€</span>
+                </div>
+                <div class="flex justify-between text-slate-300">
+                    <span>Retenção IRS:</span>
+                    <span id="valorIRS" class="text-rose-400 font-semibold">-0.00€</span>
+                </div>
+                <div class="flex justify-between text-slate-300">
+                    <span>Subsídio de Alimentação Líquido:</span>
+                    <span id="valorSub" class="text-emerald-300 font-semibold">+0.00€</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Informativo para SEO e Aprovação AdSense -->
+        <div class="text-xs text-slate-400 space-y-2 border-t border-slate-800 pt-4 leading-relaxed">
+            <h2 class="font-bold text-slate-200 text-sm">Como é calculado o salário líquido?</h2>
+            <p>O cálculo do vencimento líquido parte do salário base bruto, ao qual são subtraídos os descontos obrigatórios para a <strong>Segurança Social (11%)</strong> para trabalhadores por conta de outrem e a respetiva <strong>retenção na fonte de IRS</strong>.</p>
+            <p>Ao valor resultante soma-se o subsídio de alimentação. Quando pago em cartão refeição, beneficia de um limite de isenção fiscal superior face ao pagamento em dinheiro.</p>
+        </div>
+    </div>
+
+    <!-- Rodapé com link para a Política de Privacidade -->
+    <footer class="mt-6 text-center text-xs text-slate-500">
+        <p class="mb-1">Ferramenta meramente informativa. Os valores apresentados são estimativas.</p>
+        <a href="privacidade.html" class="hover:text-emerald-400 underline">Política de Privacidade</a>
+    </footer>
+
+    <script>
+        function simular() {
+            const bruto = parseFloat(document.getElementById('salarioBruto').value) || 0;
+            const taxaIrs = parseFloat(document.getElementById('taxaIrs').value) || 0;
+            const subDia = parseFloat(document.getElementById('subAlimentacaoDia').value) || 0;
+            const dias = parseInt(document.getElementById('diasUteis').value) || 0;
+            const tipoSub = document.getElementById('tipoSubsidio').value;
+
+            document.getElementById('labelIrs').textContent = taxaIrs.toFixed(1) + '%';
+
+            // Limites de isenção do subsídio de alimentação
+            const limiteIsencao = tipoSub === 'cartao' ? 9.60 : 6.00;
+            const excedenteSubDia = Math.max(0, subDia - limiteIsencao);
+            const totalExcedenteSub = excedenteSubDia * dias;
+            const totalSubBruto = subDia * dias;
+
+            // Base tributável inclui salário bruto + parte não isenta do subsídio
+            const baseTributavel = bruto + totalExcedenteSub;
+
+            const descontoSS = baseTributavel * 0.11;
+            const descontoIRS = baseTributavel * (taxaIrs / 100);
+
+            const liquidoTotal = (bruto + totalSubBruto) - descontoSS - descontoIRS;
+
+            document.getElementById('salarioLiquido').textContent = liquidoTotal.toFixed(2) + '€';
+            document.getElementById('valorSS').textContent = '-' + descontoSS.toFixed(2) + '€';
+            document.getElementById('valorIRS').textContent = '-' + descontoIRS.toFixed(2) + '€';
+            document.getElementById('valorSub').textContent = '+' + totalSubBruto.toFixed(2) + '€';
+        }
+        simular();
+    </script>
+</body>
+</html>
